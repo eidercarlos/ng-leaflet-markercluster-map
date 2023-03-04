@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import * as Leaflet from 'leaflet';
+import { icon, latLng, marker } from 'leaflet';
 
 Leaflet.Icon.Default.imagePath = 'assets/';
 
@@ -9,8 +10,13 @@ Leaflet.Icon.Default.imagePath = 'assets/';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
+
   map!: Leaflet.Map;
   markers: Leaflet.Marker[] = [];
+
+  markerClusterGroup: Leaflet.MarkerClusterGroup = Leaflet.markerClusterGroup({removeOutsideVisibleBounds: true});
+  markerClusterData = [];
+
   options = {
     layers: [
       Leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -36,6 +42,7 @@ export class AppComponent {
         draggable: true
       }
     ];
+
     for (let index = 0; index < initialMarkers.length; index++) {
       const data = initialMarkers[index];
       const marker = this.generateMarker(data, index);
@@ -43,7 +50,27 @@ export class AppComponent {
       this.map.panTo(data.position);
       this.markers.push(marker)
     }
+
   }
+
+  private createMarker() {
+    const mapIcon = this.getDefaultIcon();
+    const coordinates = latLng([this.mapPoint.latitude, this.mapPoint.longitude]);
+    this.lastLayer = marker(coordinates).setIcon(mapIcon);
+    this.markerClusterGroup.addLayer(this.lastLayer)
+  }
+
+  private getDefaultIcon() {
+      return icon({
+        iconSize: [25, 41],
+        iconAnchor: [13, 41],
+        iconUrl: 'assets/marker-icon.png'
+      });
+  }
+  
+  private addLayersToMap() {
+    this.markerClusterGroup.addTo(this.map);
+  }  
 
   generateMarker(data: any, index: number) {
     return Leaflet.marker(data.position, { draggable: data.draggable })
