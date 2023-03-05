@@ -42,22 +42,16 @@ export class AppComponent {
         draggable: true
       }
     ];
-
+    
     for (let index = 0; index < initialMarkers.length; index++) {
+      const mapIcon = this.getDefaultIcon();
       const data = initialMarkers[index];
-      const marker = this.generateMarker(data, index);
-      marker.addTo(this.map).bindPopup(`<b>${data.position.lat},  ${data.position.lng}</b>`);
-      this.map.panTo(data.position);
-      this.markers.push(marker)
-    }
+      const coordinates = latLng([data.position.lat, data.position.lng]);
+      this.markerClusterGroup.addLayer(marker(coordinates).setIcon(mapIcon));
+    }    
 
-  }
+    this.addLayersToMap();
 
-  private createMarker() {
-    const mapIcon = this.getDefaultIcon();
-    const coordinates = latLng([this.mapPoint.latitude, this.mapPoint.longitude]);
-    this.lastLayer = marker(coordinates).setIcon(mapIcon);
-    this.markerClusterGroup.addLayer(this.lastLayer)
   }
 
   private getDefaultIcon() {
@@ -93,5 +87,5 @@ export class AppComponent {
 
   markerDragEnd($event: any, index: number) {
     console.log($event.target.getLatLng());
-  }   
+  }
 }
